@@ -1,6 +1,6 @@
 ---
 name: knowledge-vault
-description: Operate a local knowledge-base vault (.vault/ directory) within any project. This skill should be used when the user says "vault init", "vault ingest", "vault compile", "vault lint", "vault query", "vault process", "vault status", "add to vault", "ask the vault", "check the vault", or references the .vault/ directory. The vault ingests raw sources, compiles them into a wiki of summaries and concept articles with cross-references, lints for consistency, and supports grounded Q&A.
+description: Operate a local knowledge-base vault (.vault/ directory) within any project. This skill should be used when the user says "vault init", "vault ingest", "vault compile", "vault lint", "vault query", "vault process", "vault status", "vault agent reset", "add to vault", "ask the vault", "check the vault", or references the .vault/ directory. The vault ingests raw sources, compiles them into a wiki of summaries and concept articles with cross-references, lints for consistency, and supports grounded Q&A.
 ---
 
 # Knowledge Vault
@@ -12,6 +12,7 @@ A local, project-scoped knowledge base operated entirely by Claude. Raw sources 
 ```
 .vault/
   preferences.md      User preferences (interview-generated, manually editable)
+  agent.md            Learned retrieval intelligence (auto-maintained)
   Clippings/          Obsidian Web Clipper landing zone (default folder)
   raw/                Ingested sources with YAML frontmatter
     .manifest.json    Source registry
@@ -138,6 +139,41 @@ Contains three tables:
 3. **Concepts**: concept name, number of linked sources, one-line description
 4. **Recent Outputs**: recent query results and lint reports
 
+### Agent File (`.vault/agent.md`)
+
+Auto-maintained by Claude. Users should NOT edit this file. Contains learned retrieval intelligence that improves query efficiency over time.
+
+Hard ceiling: 6,000 characters. Read cost: ~1,000 tokens at maturity.
+
+```yaml
+---
+title: Vault Agent
+version: 1
+updated: "ISO timestamp"
+vault_stats:
+  total_queries: 0
+  total_compiles: 0
+  cache_hits: 0
+  tier3_fallbacks: 0
+---
+```
+
+Four bounded sections:
+
+| Section | Max entries | Purpose |
+|---------|-----------|---------|
+| **Concept Clusters** | 8 | Groups of concepts frequently co-accessed in queries |
+| **Query Patterns** | 10 | Maps question keywords → specific articles that answer them |
+| **Source Signals** | 15 | Tracks which sources are most frequently useful and for what topics |
+| **Corrections** | 5 (FIFO) | Logs retrieval mistakes to prevent repeating them |
+
+**Entry format**: One line per entry, ~120-150 characters. Example:
+```
+- {exposure-aging}: ambient-air-pollution, biological-age-acceleration | queries: 9 | last: 2026-04-15
+```
+
+**Minimum viable threshold**: agent.md is only read when `total_queries >= 3` OR `source_count >= 5`. Below this, index.md alone is sufficient.
+
 ---
 
 ## Operations
@@ -233,6 +269,7 @@ Process uncompiled raw sources into wiki articles.
    f. **Mark compiled**: Set `compiled: true` in the raw file's YAML frontmatter. Update the manifest entry.
 3. **Rebuild index**: Regenerate `wiki/index.md` from the manifest and concept file list. Source table sorted by ingestion date (newest first). Concept table sorted alphabetically.
 4. **Update state**: Update `wiki/.state.json` with new counts and `last_compiled` timestamp.
+5. **Update agent.md**: For each newly compiled source, add or update its entry in the Source Signals section of `.vault/agent.md`. Set initial cited count to 0. Record the source's primary topic domains based on concepts extracted. Increment `vault_stats.total_compiles`. Do NOT create Query Patterns from compilation (patterns are query-driven only).
 
 **Concept slug rules**: Lowercase, hyphens, max 60 chars. Example: "Self-Attention" → `self-attention`.
 
@@ -240,7 +277,7 @@ Process uncompiled raw sources into wiki articles.
 
 ### vault lint
 
-Run 7 health checks on the wiki.
+Run 8 health checks on the wiki.
 
 **Procedure:**
 
@@ -257,10 +294,12 @@ Run 7 health checks on the wiki.
 | 5 | **Thin articles** | Concept articles under 100 words. | Suggestion |
 | 6 | **Duplicate concepts** | Articles covering the same topic (check `aliases` overlap and title similarity). | Warning |
 | 7 | **Gap analysis** | Based on existing concepts, suggest missing topics that would strengthen the knowledge graph. | Suggestion |
+| 8 | **Agent staleness** | agent.md references concepts or sources that no longer exist in the vault. Query patterns target deleted articles. | Warning |
 
 3. Write the report to `wiki/outputs/lint-YYYY-MM-DD.md` with findings grouped by check.
 4. Update `wiki/.state.json` with `last_lint` timestamp.
 5. Print a summary: "Vault lint: X critical, Y warnings, Z suggestions."
+6. If check 8 finds issues, automatically clean agent.md by removing references to non-existent content.
 
 ### vault query
 
@@ -268,7 +307,8 @@ Answer a question grounded in the vault's knowledge. Automatically classifies ea
 
 **Procedure:**
 
-0. **Read `.vault/preferences.md`** — apply domain framing, source weighting, and answer depth preferences.
+0. **Read `.vault/preferences.md`**. If `.vault/agent.md` exists AND (`vault_stats.total_queries >= 3` OR `wiki/.state.json` stats.source_count >= 5), also read `.vault/agent.md`.
+0.5. **Agent-directed pre-routing** (only if agent.md was read): Before reading index.md, scan agent.md Query Patterns for keyword matches against the user's question. If a pattern matches, note its suggested articles as priority reads. Also check Concept Clusters — if the query touches a concept in a cluster, plan to read the full cluster. Agent.md is advisory, NOT authoritative — always still read index.md in the next step.
 1. **Read index first**: Read `wiki/index.md` to understand what the vault contains.
 2. **Identify relevant articles**: From the index tables, pick summaries and concepts that are relevant to the question.
 3. **Read articles**: Read the identified summaries and concept articles (Tier 2). Only go to raw sources (Tier 3) if summaries lack sufficient detail.
@@ -323,6 +363,22 @@ This prevents the concept graph from accumulating speculative connections. Only 
    - Record: "Filed for reference — comprehensive analysis across N sources"
    - Skip: "Quick lookup — not filed" or "Already covered in outputs/existing-slug.md"
 
+**Post-query agent.md update** (after every query):
+
+After composing the answer, update `.vault/agent.md`:
+
+a. **Pattern reinforcement**: If a Query Pattern's suggested articles matched what was actually useful, increment its hit count.
+b. **Pattern expansion**: If useful articles were not predicted by any pattern, update the closest matching pattern or create a new one (if under 10 slots).
+c. **Pattern decay**: If a pattern's suggested articles were read but not useful, decrement its hit count. At 0 hits, evict the pattern.
+d. **Cluster discovery**: If 2+ concepts were co-accessed and don't already share a cluster, create or merge into a cluster (if under 8 slots).
+e. **Source signal update**: Increment cited count for any source whose summary or raw content contributed to the answer.
+f. **Correction logging**: If agent.md routing led to a wrong path (Claude had to discard and re-route), log the correction (max 5, FIFO).
+g. **Stats update**: Increment `total_queries`. If no Tier 3 reads were needed, increment `cache_hits`. Otherwise increment `tier3_fallbacks`.
+h. **Decay check**: Every 20 queries (when `total_queries % 20 == 0`), divide all hit counts by 2 (integer division). This implements exponential decay — recent patterns outweigh old ones.
+i. **Eviction**: If any section is at capacity and a new entry is needed, evict the entry with lowest hit/cited count. If tied, evict the oldest.
+
+Write the updated `.vault/agent.md`.
+
 **3-tier routing strategy:**
 - Tier 1 (always): `wiki/index.md` — scan for relevance
 - Tier 2 (on demand): `wiki/summaries/` and `wiki/concepts/` — read relevant articles
@@ -350,6 +406,13 @@ Print a quick summary of the vault state.
 
 1. Run: `bash ~/.claude/skills/knowledge-vault/scripts/vault-status.sh`
 2. Display the output to the user.
+
+### vault agent reset
+
+Reset the learned retrieval intelligence. Use when agent.md has accumulated wrong patterns or the vault's domain has significantly changed.
+
+1. Overwrite `.vault/agent.md` with the empty template (same as vault init creates).
+2. Confirm to the user: "Agent reset. Retrieval patterns cleared. The agent will re-learn from your next queries."
 
 ---
 

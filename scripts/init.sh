@@ -68,6 +68,36 @@ _No concepts extracted yet. Use `vault compile` after ingesting sources._
 _No queries filed yet._
 EOF
 
+# Create empty agent.md
+cat > "$VAULT_DIR/agent.md" << 'EOF'
+---
+title: Vault Agent
+version: 1
+updated: null
+vault_stats:
+  total_queries: 0
+  total_compiles: 0
+  cache_hits: 0
+  tier3_fallbacks: 0
+---
+
+## Concept Clusters
+
+_No clusters discovered yet._
+
+## Query Patterns
+
+_No patterns recorded yet._
+
+## Source Signals
+
+_No source signals yet._
+
+## Corrections
+
+_No corrections logged._
+EOF
+
 # Copy templates from skill assets
 if [ -d "$SKILL_DIR/assets/templates" ]; then
     cp "$SKILL_DIR/assets/templates"/*.md "$VAULT_DIR/templates/" 2>/dev/null || true
