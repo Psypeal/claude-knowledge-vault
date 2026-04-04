@@ -11,6 +11,7 @@ A local, project-scoped knowledge base operated entirely by Claude. Raw sources 
 
 ```
 .vault/
+  preferences.md      User preferences (interview-generated, manually editable)
   Clippings/          Obsidian Web Clipper landing zone (default folder)
   raw/                Ingested sources with YAML frontmatter
     .manifest.json    Source registry
@@ -143,11 +144,54 @@ Contains three tables:
 
 ### vault init
 
-Initialize a vault in the current project.
+Initialize a vault in the current project with personalized preferences.
+
+**Procedure:**
 
 1. Run: `bash ~/.claude/skills/knowledge-vault/scripts/init.sh`
 2. This creates `.vault/` with empty structure and appends instructions to CLAUDE.md.
-3. Confirm to the user that the vault is ready and suggest opening `.vault/` in Obsidian.
+3. **Interview the user** to configure `.vault/preferences.md`. Ask these questions one at a time, adapting based on answers. Skip questions that are obvious from project context:
+
+   a. **Domain**: "What domain is this vault for?" (e.g., ML research, biomedical science, web development, general)
+   b. **Source types**: "What sources will you mainly use?" (papers, articles, code repos, meeting notes, web clips)
+   c. **Priority rules**: "Any priority for sources?" (e.g., peer-reviewed over blog posts, recent over old, primary data over reviews)
+   d. **Concept detail**: "How granular should concepts be?" (broad overview — fewer, larger articles / balanced / granular — many specific articles)
+   e. **Compilation focus**: "Any special instructions for how sources should be summarized?" (e.g., always extract methodology, focus on clinical relevance, emphasize code architecture)
+
+   If the user says "skip" or wants defaults, generate a sensible preferences file based on the project context.
+
+4. Write `.vault/preferences.md` from the interview answers:
+
+```yaml
+---
+title: Vault Preferences
+updated: "ISO timestamp"
+---
+
+## Domain
+[domain from interview]
+
+## Source Priority
+[priority rules — ranked list]
+
+## Concept Granularity
+[broad | balanced | granular]
+
+## Compilation Focus
+[specific instructions for how to summarize and extract concepts]
+
+## Custom Rules
+[any additional user-specified preferences]
+```
+
+5. Confirm to the user that the vault is ready and suggest opening `.vault/` in Obsidian.
+
+**Preferences file contract:**
+- Claude MUST read `.vault/preferences.md` at the start of every vault operation (compile, lint, query, process).
+- The user may edit this file manually at any time. Claude always respects the latest version.
+- During `vault compile`: preferences guide summary style, concept granularity, and what to prioritize in extraction.
+- During `vault query`: preferences guide answer depth, source weighting, and domain framing.
+- During `vault lint`: preferences inform what counts as "thin" or "stale" (domain-dependent).
 
 ### vault ingest
 
@@ -174,6 +218,7 @@ Process uncompiled raw sources into wiki articles.
 
 **Procedure:**
 
+0. **Read `.vault/preferences.md`** — apply domain, priority, granularity, and compilation focus to all steps below.
 1. Read `raw/.manifest.json`. Identify entries where `compiled: false`.
    - If the user names a specific source, compile only that one.
    - Otherwise, compile all pending.
@@ -199,6 +244,7 @@ Run 7 health checks on the wiki.
 
 **Procedure:**
 
+0. **Read `.vault/preferences.md`** — preferences inform what counts as "thin", "stale", or a priority gap.
 1. Read `wiki/index.md` and scan all concept and summary articles.
 2. Run these checks:
 
@@ -222,6 +268,7 @@ Answer a question grounded in the vault's knowledge. Automatically classifies ea
 
 **Procedure:**
 
+0. **Read `.vault/preferences.md`** — apply domain framing, source weighting, and answer depth preferences.
 1. **Read index first**: Read `wiki/index.md` to understand what the vault contains.
 2. **Identify relevant articles**: From the index tables, pick summaries and concepts that are relevant to the question.
 3. **Read articles**: Read the identified summaries and concept articles (Tier 2). Only go to raw sources (Tier 3) if summaries lack sufficient detail.
@@ -287,6 +334,7 @@ Batch operation: ingest all Clippings, then compile all pending.
 
 **Procedure:**
 
+0. **Read `.vault/preferences.md`** — apply preferences to ingestion and compilation steps.
 1. Scan `.vault/Clippings/` for `.md` files (Obsidian Web Clipper's default folder).
 2. For each file:
    a. Read the file. Extract title and metadata from YAML frontmatter (Obsidian Web Clipper format).

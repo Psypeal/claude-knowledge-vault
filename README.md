@@ -132,6 +132,40 @@ Open `.vault/` as an Obsidian vault. Zero configuration needed.
 
 <br />
 
+## Personalized Preferences
+
+During `vault init`, Claude interviews you about your vault's domain and priorities:
+
+```
+> vault init
+  Vault initialized at .vault/
+
+  Let me configure your vault preferences.
+
+  What domain is this vault for?
+> Biomedical research — neuroimaging and neurodegeneration
+
+  What sources will you mainly use?
+> Papers from PubMed, review articles, and meeting notes
+
+  Any priority rules for sources?
+> Peer-reviewed > preprints > blog posts. Prioritize longitudinal studies.
+
+  How granular should concepts be?
+> Balanced — not too broad, not too narrow
+
+  Any special compilation instructions?
+> Always extract methodology and sample size. Note statistical methods used.
+
+  Preferences saved to .vault/preferences.md
+```
+
+This creates `.vault/preferences.md` — Claude reads it at the start of **every** vault operation. It shapes how sources are summarized, which concepts are extracted, and how queries are answered.
+
+You can edit `preferences.md` manually anytime. Claude always picks up the latest version.
+
+<br />
+
 ## 3-Tier Query Routing
 
 Queries stay efficient at any vault size. Claude never loads everything — it reads the index, picks what's relevant, and drills down only when needed.
