@@ -218,7 +218,7 @@ Run 7 health checks on the wiki.
 
 ### vault query
 
-Answer a question grounded in the vault's knowledge.
+Answer a question grounded in the vault's knowledge. Automatically classifies each query to maximize compounding value while avoiding noise.
 
 **Procedure:**
 
@@ -226,19 +226,37 @@ Answer a question grounded in the vault's knowledge.
 2. **Identify relevant articles**: From the index tables, pick summaries and concepts that are relevant to the question.
 3. **Read articles**: Read the identified summaries and concept articles (Tier 2). Only go to raw sources (Tier 3) if summaries lack sufficient detail.
 4. **Answer**: Compose an answer grounded in the vault content. Use `[[wikilinks]]` to reference source articles inline.
-5. **File (optional)**: If the user says "file it" or the answer is substantial, write it to `wiki/outputs/<descriptive-slug>.md` with frontmatter:
+5. **Classify and act**: After composing the answer, classify it into one of three tiers:
+
+**Query classification (automatic):**
+
+| Tier | Criteria | Action | Compounds? |
+|------|----------|--------|------------|
+| **Synthesize** | Answer connects 2+ sources, reveals new relationships between concepts, or produces an insight not present in any single article | File to `wiki/outputs/` AND update `related` fields in affected concept articles AND add any newly discovered cross-references | Yes — enriches the concept graph |
+| **Record** | Answer is substantial (200+ words) and provides a useful reference, but doesn't produce new connections | File to `wiki/outputs/` only | Partially — available for future queries |
+| **Skip** | Simple lookup, factual retrieval from a single source, status check, or question already answered in an existing output | Answer only, do not file | No — avoids noise |
+
+**When filing** (Synthesize or Record), write to `wiki/outputs/<descriptive-slug>.md`:
 
 ```yaml
 ---
 title: "Q: The question asked"
 query: "The original question"
 created: "ISO timestamp"
+classification: synthesize|record
 sources_consulted: [slug1, slug2]
 concepts_referenced: [concept-a, concept-b]
+new_connections: [concept-a -> concept-b]    # synthesize tier only
 ---
 ```
 
-6. Update `wiki/index.md` recent outputs section if an output was filed.
+6. **Synthesize tier only**: After filing, update the affected concept articles:
+   - Add new entries to `related` fields in both directions
+   - Add a brief note in the Source Evidence section referencing the output
+   - This is what creates the compounding effect — the vault becomes smarter with each deep query
+
+7. Update `wiki/index.md` recent outputs section if an output was filed.
+8. Tell the user which tier was applied: "Filed as synthesis (new connection: X ↔ Y)" or "Filed for reference" or "Quick lookup — not filed."
 
 **3-tier routing strategy:**
 - Tier 1 (always): `wiki/index.md` — scan for relevance
