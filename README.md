@@ -50,25 +50,27 @@ flowchart LR
 
 ### New install
 
-First, add the marketplace (one time only):
+**Step 1** — Add the marketplace (one time only):
 
 ```bash
 /plugin marketplace add psypeal/claude-knowledge-vault
 ```
 
-Then install — choose your scope:
+**Step 2** — Install via the plugin UI:
 
-**Project-level** (recommended — only active in the current project):
 ```bash
-/plugin install knowledge-vault@claude-knowledge-vault --scope project
+/plugin
 ```
 
-**User-level** (active in all projects):
-```bash
-/plugin install knowledge-vault@claude-knowledge-vault
-```
+In the **Discover** tab, find `knowledge-vault` and press Enter. You'll be prompted to choose an installation scope:
 
-Finally, reload:
+| Scope | What it does | Best for |
+|:------|:-------------|:---------|
+| **Project** | Active in the current project only | Recommended — not every project needs a vault |
+| **User** | Active in all projects | If you want the vault available everywhere |
+| **Local** | Active in this repo for you only, not shared | Personal use in shared repos |
+
+**Step 3** — Reload:
 
 ```bash
 /reload-plugins
