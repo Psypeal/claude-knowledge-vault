@@ -11,5 +11,5 @@ description: Batch ingest Clippings and compile all pending
    b. Generate slug from the title (lowercase, hyphens, max 60 chars).
    c. Move to `raw/<slug>.md` (reformat frontmatter to vault schema if needed).
    d. Add entry to `raw/.manifest.json`.
-3. After all clippings ingested, run the compile procedure (from `/knowledge-vault:compile`) on all pending sources.
+3. After all clippings ingested, run the compile procedure (from `/knowledge-vault:compile`) on all pending sources in a single batch pass (do not compile one-by-one).
 4. Report: "Processed N clippings, compiled M sources, extracted K new concepts."

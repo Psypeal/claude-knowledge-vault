@@ -17,4 +17,4 @@ The search query and optional filters are in `$ARGUMENTS`. Parse: query text, `-
 
 5. User picks which results to ingest (e.g., "1,3,5" or "all").
 6. For each selected result, run the ingest procedure (from `/knowledge-vault:ingest`) with `type: paper`.
-7. After batch ingest, offer: "Run compile on the new sources now?"
+7. After batch ingest, offer: "Run compile on all ingested sources in one batch pass now?"

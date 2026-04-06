@@ -7,14 +7,15 @@ argument-hint: "[source-slug]"
 
 If `$ARGUMENTS` names a specific source slug, compile only that source. Otherwise compile all pending.
 
+> **Batch mode** (2+ pending sources): read all raw sources first, build a merged compilation plan, then execute all writes in a single pass.
+
 0. Read `.vault/preferences.md` — apply domain, priority, granularity, and compilation focus.
 1. Read `.vault/raw/.manifest.json`. Identify entries where `compiled: false`.
-2. **Plan phase**: For each pending source, read the raw file and produce a compilation plan:
+2. **Plan phase**: Read ALL pending raw sources sequentially. For each, note concepts to create/update and evidence to extract. Then MERGE: if sources A and B both touch concept X, group those updates together.
    - Which concepts to create vs update
    - Key evidence to extract
    - Cross-references to add
-   Group by concept — if multiple sources touch the same concept, merge updates.
-3. **Execute phase**: Work through the plan:
+3. **Execute phase**: Process each unique concept ONCE across all sources. Do not re-read a concept file that was already read for another source in this batch. Work through the plan:
    a. Write summaries (`wiki/summaries/<slug>.md`, 200-500 words):
       ```yaml
       ---
