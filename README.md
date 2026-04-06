@@ -70,8 +70,6 @@ flowchart LR
 
 No config, no dependencies, no API keys.
 
-> **Note on scope:** The plugin installs at **user scope** — this is correct. The plugin is just the tool (commands, skills, scripts). Your actual knowledge base (`.vault/` directory) is always project-local, created per-project when you run `/knowledge-vault:init`. Think of it like `git` — installed globally, but each `.git/` is per-repo.
-
 ### Uninstall
 
 ```bash
