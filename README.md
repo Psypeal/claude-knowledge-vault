@@ -32,13 +32,13 @@ flowchart LR
         CO["Consensus"]
         PS["Paper Search\n(14 databases)"]
     end
-    collect -->|"/vault:collect"| R["raw/\n.manifest.json\nsources.json"]
-    A["URLs, files,\nnotes, clips"] -->|"/vault:ingest"| R
+    collect -->|"/knowledge-vault:collect"| R["raw/\n.manifest.json\nsources.json"]
+    A["URLs, files,\nnotes, clips"] -->|"/knowledge-vault:ingest"| R
     CL["Obsidian\nWeb Clipper"] -->|auto| CLP["Clippings/"]
-    CLP -->|"/vault:process"| R
-    R -->|"/vault:compile"| W["wiki/\nsummaries/\nconcepts/\nindex.md"]
-    W -->|"/vault:query"| ANS["Grounded\nAnswers"]
-    W -->|"/vault:lint"| H["Health\nReport"]
+    CLP -->|"/knowledge-vault:process"| R
+    R -->|"/knowledge-vault:compile"| W["wiki/\nsummaries/\nconcepts/\nindex.md"]
+    W -->|"/knowledge-vault:query"| ANS["Grounded\nAnswers"]
+    W -->|"/knowledge-vault:lint"| H["Health\nReport"]
     W -->|browse| O["Obsidian\nGraph View"]
 ```
 
@@ -98,7 +98,7 @@ See [Migration](#migration) for full details.
 ## Quick Start
 
 ```
-> /vault:init
+> /knowledge-vault:init
   Vault initialized at .vault/
 
   Let me configure your vault preferences.
@@ -108,9 +108,9 @@ See [Migration](#migration) for full details.
 
   Preferences saved to .vault/preferences.md
 
-  Tip: Run /vault:setup-sources to configure academic databases.
+  Tip: Run /knowledge-vault:setup-sources to configure academic databases.
 
-> /vault:setup-sources
+> /knowledge-vault:setup-sources
   Detected:
     PubMed (Claude.ai built-in)         active
     Scholar Gateway (Claude.ai built-in) active
@@ -125,7 +125,7 @@ See [Migration](#migration) for full details.
 
   Added 2 servers. Sources saved to .vault/sources.json
 
-> /vault:collect tau PET imaging neurodegeneration --since 2023
+> /knowledge-vault:collect tau PET imaging neurodegeneration --since 2023
   Searching PubMed, Scholar Gateway, Consensus, arXiv...
 
   | # | Title                                         | Source   | Date | Type   |
@@ -139,12 +139,12 @@ See [Migration](#migration) for full details.
 
   Ingested 3 sources. 3 pending compilation.
 
-> /vault:compile
+> /knowledge-vault:compile
   Compiled 3 sources. Extracted 7 concepts:
   tau-pet-imaging, neurodegeneration, alzheimers-disease, tau-tracers,
   subcortical-tau, longitudinal-imaging, amyloid-tau-interaction
 
-> /vault:query What is the current evidence for second-generation tau tracers?
+> /knowledge-vault:query What is the current evidence for second-generation tau tracers?
   Based on the vault: Second-generation tau PET tracers (e.g., [18F]MK-6240,
   [18F]PI-2620) show improved off-target binding profiles compared to
   first-generation [18F]AV-1451. Three vault sources report higher specificity
@@ -158,23 +158,23 @@ See [Migration](#migration) for full details.
 
 | Command | Description |
 |:--------|:------------|
-| **`/vault:init`** | Initialize a `.vault/` knowledge base in the current project |
-| **`/vault:ingest <source>`** | Add a raw source -- URL, pasted text, or file path |
-| **`/vault:collect <query>`** | Batch search academic databases and selectively ingest results |
-| **`/vault:setup-sources`** | Configure research MCP servers for academic collection |
-| **`/vault:compile`** | Compile pending sources into wiki summaries and concept articles |
-| **`/vault:lint`** | Run 8 health checks on the wiki |
-| **`/vault:cleanup`** | Audit and actively fix article quality issues |
-| **`/vault:query <question>`** | Ask a question grounded in your vault's knowledge |
-| **`/vault:process`** | Batch: ingest all web clips + compile everything |
-| **`/vault:status`** | Print a quick status summary |
-| **`/vault:agent-reset`** | Clear learned retrieval patterns and start fresh |
+| **`/knowledge-vault:init`** | Initialize a `.vault/` knowledge base in the current project |
+| **`/knowledge-vault:ingest <source>`** | Add a raw source -- URL, pasted text, or file path |
+| **`/knowledge-vault:collect <query>`** | Batch search academic databases and selectively ingest results |
+| **`/knowledge-vault:setup-sources`** | Configure research MCP servers for academic collection |
+| **`/knowledge-vault:compile`** | Compile pending sources into wiki summaries and concept articles |
+| **`/knowledge-vault:lint`** | Run 8 health checks on the wiki |
+| **`/knowledge-vault:cleanup`** | Audit and actively fix article quality issues |
+| **`/knowledge-vault:query <question>`** | Ask a question grounded in your vault's knowledge |
+| **`/knowledge-vault:process`** | Batch: ingest all web clips + compile everything |
+| **`/knowledge-vault:status`** | Print a quick status summary |
+| **`/knowledge-vault:agent-reset`** | Clear learned retrieval patterns and start fresh |
 
 <br />
 
 ## Academic Collection
 
-The headline feature of v2. `/vault:collect` searches multiple academic databases in parallel and lets you cherry-pick which results to ingest.
+The headline feature of v2. `/knowledge-vault:collect` searches multiple academic databases in parallel and lets you cherry-pick which results to ingest.
 
 ### Supported servers
 
@@ -188,8 +188,8 @@ The headline feature of v2. `/vault:collect` searches multiple academic database
 
 ### How it works
 
-1. **`/vault:setup-sources`** detects what you already have configured and shows what else is available. You approve each server individually.
-2. **`/vault:collect <query>`** searches all enabled servers in parallel, deduplicates results, and presents a numbered table.
+1. **`/knowledge-vault:setup-sources`** detects what you already have configured and shows what else is available. You approve each server individually.
+2. **`/knowledge-vault:collect <query>`** searches all enabled servers in parallel, deduplicates results, and presents a numbered table.
 3. You pick which results to ingest -- `all`, specific numbers (`1,3,5`), or filters (`only 2024+`).
 4. Selected papers are ingested to `raw/` with full metadata and available text.
 
@@ -217,22 +217,22 @@ The 5 servers above are pre-configured suggestions, but you can add **any** MCP 
    }
    ```
 
-Once registered, `/vault:collect` will include your custom server in batch searches alongside the built-in ones.
+Once registered, `/knowledge-vault:collect` will include your custom server in batch searches alongside the built-in ones.
 
 ### Collect options
 
 ```
-/vault:collect transformers attention mechanisms          # basic search
-/vault:collect tau PET imaging --since 2023              # papers from 2023 onward
-/vault:collect CRISPR delivery --count 5                 # max 5 results per source
-/vault:collect meta-analysis sleep cognition --type review  # filter by type
+/knowledge-vault:collect transformers attention mechanisms          # basic search
+/knowledge-vault:collect tau PET imaging --since 2023              # papers from 2023 onward
+/knowledge-vault:collect CRISPR delivery --count 5                 # max 5 results per source
+/knowledge-vault:collect meta-analysis sleep cognition --type review  # filter by type
 ```
 
 <br />
 
 ## Project Structure
 
-After `/vault:init` and `/vault:setup-sources`:
+After `/knowledge-vault:init` and `/knowledge-vault:setup-sources`:
 
 ```
 your-project/
@@ -258,10 +258,10 @@ your-project/
 
 ## Personalized Preferences
 
-During `/vault:init`, Claude interviews you about your vault's domain and priorities:
+During `/knowledge-vault:init`, Claude interviews you about your vault's domain and priorities:
 
 ```
-> /vault:init
+> /knowledge-vault:init
   Vault initialized at .vault/
 
   Let me configure your vault preferences.
@@ -310,7 +310,7 @@ Every query can make the vault smarter. When you ask a question, Claude automati
 
 ```mermaid
 flowchart TD
-    Q["/vault:query"] --> A["Compose answer\nfrom vault sources"]
+    Q["/knowledge-vault:query"] --> A["Compose answer\nfrom vault sources"]
     A --> D{"Dedup check:\nalready answered?"}
     D -->|yes| S1["Reference existing output\n(no duplicate filed)"]
     D -->|no| C{"Classify"}
@@ -360,7 +360,7 @@ The vault includes a self-improving retrieval agent (`.vault/agent.md`) that lea
 
 ```mermaid
 flowchart LR
-    Q["/vault:query"] --> A["agent.md\nsuggests articles"]
+    Q["/knowledge-vault:query"] --> A["agent.md\nsuggests articles"]
     A --> R["Claude reads\npriority articles"]
     R --> ANS["Answer"]
     ANS --> E["Evaluate:\nwhat was useful?"]
@@ -393,14 +393,14 @@ Without the agent, every query scans the full index and reads 6-8 candidate arti
 - **Advisory only**: Never overrides `index.md` -- only prioritizes which articles to read first
 - **Cold start threshold**: Not activated until 3+ queries or 5+ compiled sources
 - **Exponential decay**: Every 20 queries, hit counts halve -- recent patterns outweigh old ones
-- **Self-cleaning**: `/vault:lint` detects and removes stale references
-- **Reset**: `/vault:agent-reset` clears all learned patterns if needed
+- **Self-cleaning**: `/knowledge-vault:lint` detects and removes stale references
+- **Reset**: `/knowledge-vault:agent-reset` clears all learned patterns if needed
 
 <br />
 
 ## Lint Checks
 
-`/vault:lint` runs 8 health checks to keep your knowledge base consistent:
+`/knowledge-vault:lint` runs 8 health checks to keep your knowledge base consistent:
 
 | Check | What it catches | Severity |
 |:------|:----------------|:---------|
@@ -429,7 +429,7 @@ Articles are written to a strict standard -- factual, precise, no fluff.
 - **Anti-cramming**: If a concept article develops 3+ distinct sub-topics, split into separate articles
 - **Anti-thinning**: Every article must have real substance -- stubs with 2 vague sentences are failures
 - **Quality checkpoints**: Every 5 compiled sources, audit the 3 most-updated articles for coherence
-- **`/vault:cleanup`**: Dedicated command to audit and fix all articles -- restructure diary-style articles into thematic ones, split bloated articles, enrich stubs, fix broken links
+- **`/knowledge-vault:cleanup`**: Dedicated command to audit and fix all articles -- restructure diary-style articles into thematic ones, split bloated articles, enrich stubs, fix broken links
 
 <br />
 
@@ -456,7 +456,7 @@ Open `.vault/` as an Obsidian vault. Zero configuration needed.
   </tr>
   <tr>
     <td><strong>Web Clipper</strong></td>
-    <td>Clip from browser &#8594; auto-lands in <code>Clippings/</code> &#8594; <code>/vault:process</code></td>
+    <td>Clip from browser &#8594; auto-lands in <code>Clippings/</code> &#8594; <code>/knowledge-vault:process</code></td>
   </tr>
 </table>
 
@@ -467,9 +467,9 @@ Open `.vault/` as an Obsidian vault. Zero configuration needed.
 | Feature | v1 (skill) | v2 (plugin) |
 |:--------|:-----------|:------------|
 | **Architecture** | Claude Code skill | Claude Code plugin with commands, skills, agents, hooks, and scripts |
-| **Invocation** | Natural language (`vault compile`) | Slash commands (`/vault:compile`) |
+| **Invocation** | Natural language (`vault compile`) | Slash commands (`/knowledge-vault:compile`) |
 | **Academic collection** | Manual URL ingestion only | Batch search across 5 research servers via MCP |
-| **Source management** | None | `/vault:setup-sources` + `sources.json` config |
+| **Source management** | None | `/knowledge-vault:setup-sources` + `sources.json` config |
 | **Research agent** | None | Dedicated vault-collector agent for parallel database search |
 | **Session hooks** | None | Auto-detects `.vault/` on session start |
 | **Vault format** | `.vault/` directory | Same -- fully backward compatible |
@@ -477,8 +477,8 @@ Open `.vault/` as an Obsidian vault. Zero configuration needed.
 ### Summary of changes
 
 - **Plugin architecture**: Commands are now registered slash commands, not natural-language triggers. Skills and agents are separate modules.
-- **`/vault:collect`**: New command. Searches PubMed, arXiv, Scholar Gateway, Consensus, and Paper Search in parallel. Presents results for selective ingestion. Deduplicates across sources.
-- **`/vault:setup-sources`**: New command. Detects installed MCP servers, shows available servers with ready-to-run install commands, writes `sources.json`.
+- **`/knowledge-vault:collect`**: New command. Searches PubMed, arXiv, Scholar Gateway, Consensus, and Paper Search in parallel. Presents results for selective ingestion. Deduplicates across sources.
+- **`/knowledge-vault:setup-sources`**: New command. Detects installed MCP servers, shows available servers with ready-to-run install commands, writes `sources.json`.
 - **Session hook**: On session start, detects if the project has a `.vault/` directory and loads vault context automatically.
 - **`sources.json`**: New config file tracking which research servers are configured per vault.
 
@@ -509,14 +509,14 @@ rm -rf ~/.claude/skills/knowledge-vault
 
 **Step 3** -- Verify (in any project with an existing vault):
 ```
-> /vault:status
+> /knowledge-vault:status
 ```
 
 That's it. Your existing `.vault/` directories are fully compatible. No data migration needed.
 
 **Optional** -- Configure academic sources for an existing vault:
 ```
-> /vault:setup-sources
+> /knowledge-vault:setup-sources
 ```
 
 <br />
@@ -531,7 +531,7 @@ That's it. Your existing `.vault/` directories are fully compatible. No data mig
 | **Scope** | Per-project | Global personal agent |
 | **Dependencies** | None (optional: `uv`, `npx` for MCP servers) | PostgreSQL, OpenAI API |
 | **Academic search** | 5 MCP servers, elastic config | Custom API integrations |
-| **Invocation** | `/vault:*` slash commands | Chat interface |
+| **Invocation** | `/knowledge-vault:*` slash commands | Chat interface |
 | **Browsing** | Obsidian | Custom web UI |
 
 <br />

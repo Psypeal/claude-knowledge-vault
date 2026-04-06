@@ -1,6 +1,6 @@
 ---
 name: mcp-source-configs
-description: Configuration templates for research MCP servers used by the knowledge vault. Internal skill used by /vault:setup-sources and /vault:collect.
+description: Configuration templates for research MCP servers used by the knowledge vault. Internal skill used by /knowledge-vault:setup-sources and /knowledge-vault:collect.
 user-invocable: false
 ---
 

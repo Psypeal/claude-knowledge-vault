@@ -53,7 +53,7 @@ updated: null
 
 ## Source Summaries (0 compiled)
 
-_No sources compiled yet. Use `/vault:ingest` to add sources._
+_No sources compiled yet. Use `/knowledge-vault:ingest` to add sources._
 
 ## Pending Compilation (0)
 
@@ -61,7 +61,7 @@ _No sources pending._
 
 ## Concepts (0)
 
-_No concepts extracted yet. Use `/vault:compile` after ingesting sources._
+_No concepts extracted yet. Use `/knowledge-vault:compile` after ingesting sources._
 
 ## Recent Outputs
 

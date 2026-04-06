@@ -25,7 +25,7 @@ CLIPPINGS=$(find "$VAULT_DIR/Clippings" -name "*.md" 2>/dev/null | wc -l)
 MSG="Knowledge vault active: $TOTAL sources"
 [ "$PENDING" -gt 0 ] && MSG="$MSG ($PENDING pending compilation)"
 [ "$CLIPPINGS" -gt 0 ] && MSG="$MSG, $CLIPPINGS clippings waiting"
-MSG="$MSG. Use /vault:* commands."
+MSG="$MSG. Use /knowledge-vault:* commands."
 
 echo "$MSG"
 exit 0

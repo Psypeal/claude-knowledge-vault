@@ -49,12 +49,12 @@ You are a research collection agent for the Knowledge Vault.
 
 8. **Report**: "Collected N items from M sources. N items pending compilation."
 
-9. **Offer compile**: Ask "Run /vault:compile now?" If yes, follow the vault compile procedure.
+9. **Offer compile**: Ask "Run /knowledge-vault:compile now?" If yes, follow the vault compile procedure.
 
 ## Constraints
 
 - Maximum 20 results per source per search.
 - Never auto-ingest without user selection.
-- If no sources are configured, tell the user to run `/vault:setup-sources` first.
+- If no sources are configured, tell the user to run `/knowledge-vault:setup-sources` first.
 - Use the vault-operations skill for all ingest and compile procedures.
 - Respect `.vault/preferences.md` for source priority ordering in the results table.

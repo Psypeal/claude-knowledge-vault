@@ -237,7 +237,7 @@ updated: "ISO timestamp"
 ```
 
 5. Confirm to the user that the vault is ready and suggest opening `.vault/` in Obsidian.
-6. Suggest running `/vault:setup-sources` to configure research MCP servers for academic collection.
+6. Suggest running `/knowledge-vault:setup-sources` to configure research MCP servers for academic collection.
 
 **Preferences file contract:**
 - Claude MUST read `.vault/preferences.md` at the start of every vault operation (compile, lint, query, process).

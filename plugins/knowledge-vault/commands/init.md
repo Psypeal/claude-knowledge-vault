@@ -8,4 +8,4 @@ Then interview the user for their vault preferences following the **vault-operat
 
 After setup:
 1. Suggest opening `.vault/` in Obsidian for visual navigation.
-2. Suggest running `/vault:setup-sources` to configure research MCP servers for academic collection.
+2. Suggest running `/knowledge-vault:setup-sources` to configure research MCP servers for academic collection.

@@ -1,6 +1,6 @@
 # sources.json Schema
 
-The `.vault/sources.json` file tracks which research MCP servers are configured for this vault. It is created by `vault init` (empty) and populated by `/vault:setup-sources`.
+The `.vault/sources.json` file tracks which research MCP servers are configured for this vault. It is created by `vault init` (empty) and populated by `/knowledge-vault:setup-sources`.
 
 ## Schema
 
@@ -96,6 +96,6 @@ Created by `vault init`:
 
 ## Usage
 
-- **Read by**: `/vault:collect` (to know which servers to search), `/vault:setup-sources` (to show current state), `detect-mcp-sources.sh` (to compare detected vs configured)
-- **Written by**: `/vault:setup-sources` (after user approves server additions)
+- **Read by**: `/knowledge-vault:collect` (to know which servers to search), `/knowledge-vault:setup-sources` (to show current state), `detect-mcp-sources.sh` (to compare detected vs configured)
+- **Written by**: `/knowledge-vault:setup-sources` (after user approves server additions)
 - **Location**: `.vault/sources.json` (project-scoped, not global)

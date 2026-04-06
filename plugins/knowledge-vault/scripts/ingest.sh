@@ -7,7 +7,7 @@ set -euo pipefail
 VAULT_DIR=".vault"
 
 if [ ! -d "$VAULT_DIR" ]; then
-    echo "Error: No .vault/ directory found. Run /vault:init first."
+    echo "Error: No .vault/ directory found. Run /knowledge-vault:init first."
     exit 1
 fi
 
