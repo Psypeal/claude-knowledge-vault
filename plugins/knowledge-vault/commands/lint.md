@@ -1,25 +1,30 @@
 ---
-description: Run 8 health checks on the wiki
+description: Run health checks on the wiki
 ---
 
 ## Procedure
 
-0. Read `.vault/preferences.md` -- preferences inform what counts as "thin", "stale", or a priority gap.
-1. Read `wiki/index.md` and scan all concept and summary articles.
-2. Run these checks:
+**Step 1 — Automated checks (via script, no tokens):**
 
-| # | Check | Look for | Severity |
-|---|-------|----------|----------|
-| 1 | Contradictions | Conflicting claims across articles; cite both sources | Critical |
-| 2 | Stale articles | Concept `updated` older than newest source in its `sources` list | Warning |
-| 3 | Missing concepts | `[[wikilink]]` targets with no concept article | Warning |
-| 4 | Orphaned articles | Concepts with zero sources, or summaries whose raw file is missing | Warning |
-| 5 | Thin articles | Concept articles under 100 words | Suggestion |
-| 6 | Duplicate concepts | Same topic covered twice (check `aliases` overlap + title similarity) | Warning |
-| 7 | Gap analysis | Suggest missing topics that would strengthen the knowledge graph | Suggestion |
-| 8 | Agent staleness | agent.md references non-existent concepts, sources, or deleted articles | Warning |
+```bash
+bash "${CLAUDE_PLUGIN_ROOT}/scripts/lint-checks.sh"
+```
 
-3. Write report to `wiki/outputs/lint-YYYY-MM-DD.md` grouped by check.
-4. Update `wiki/.state.json` with `last_lint` timestamp.
-5. Print summary: "Vault lint: X critical, Y warnings, Z suggestions."
-6. If check 8 finds issues, automatically clean agent.md by removing references to non-existent content.
+This runs checks 2-6 and 8 (stale, missing concepts, orphaned, thin, duplicate aliases, agent staleness) by scanning frontmatter and file existence. Save the output.
+
+**Step 2 — Claude checks (only if vault has 5+ concepts):**
+
+Only read articles for these two checks if `wiki/.state.json` shows `concept_count >= 5`. Otherwise skip and report "Vault too small for contradiction/gap checks."
+
+- **Check 1 (Contradictions)**: Read the 5 most-connected concepts (from `wiki/_backlinks.json` — pick slugs with most backlinks). Look for conflicting claims. Cite both sources.
+- **Check 7 (Gap analysis)**: From `wiki/index.md` concept table only (already read), suggest 1-3 missing topics that would strengthen connections.
+
+**Step 3 — Write report:**
+
+Combine script output + Claude checks into `wiki/outputs/lint-YYYY-MM-DD.md`. Run:
+
+```bash
+bash "${CLAUDE_PLUGIN_ROOT}/scripts/rebuild-index.sh"
+```
+
+Print summary: "Vault lint: X critical, Y warnings, Z suggestions."
