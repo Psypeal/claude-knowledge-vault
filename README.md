@@ -84,6 +84,14 @@ By default, `/plugin install` installs at **user scope** (available in all proje
 | **Project** | Active in this project, shared with collaborators | Recommended for team projects |
 | **Local** | Active in this repo for you only, not shared | Personal use in shared repos |
 
+### Uninstall
+
+```bash
+/plugin uninstall knowledge-vault@claude-knowledge-vault
+```
+
+To uninstall from a specific scope, use the `/plugin` **Installed** tab — select the plugin and choose **Uninstall**.
+
 ### Migrating from v1 (skill)
 
 Existing vaults are untouched — the `.vault/` directory format is unchanged.
