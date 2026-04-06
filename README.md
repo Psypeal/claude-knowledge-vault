@@ -50,24 +50,34 @@ flowchart LR
 
 ### New install
 
-```bash
-git clone https://github.com/psypeal/claude-knowledge-vault.git ~/.claude/plugins/knowledge-vault
+In Claude Code, run these three commands:
+
+```
+/plugin marketplace add psypeal/claude-knowledge-vault
+/plugin install knowledge-vault@claude-knowledge-vault
+/reload-plugins
 ```
 
-No config. No dependencies. No API keys. Clone and go.
+That's it. No config, no dependencies, no API keys.
 
 ### Migrating from v1 (skill)
 
-Existing vaults are untouched -- the `.vault/` directory format is unchanged.
+Existing vaults are untouched — the `.vault/` directory format is unchanged.
 
 ```bash
 # 1. Remove the old skill
 rm -rf ~/.claude/skills/knowledge-vault
+```
 
-# 2. Install the plugin
-git clone https://github.com/psypeal/claude-knowledge-vault.git ~/.claude/plugins/knowledge-vault
+Then in Claude Code:
 
-# 3. Done -- your existing .vault/ directories work as-is
+```
+# 2. Add marketplace and install plugin
+/plugin marketplace add psypeal/claude-knowledge-vault
+/plugin install knowledge-vault@claude-knowledge-vault
+/reload-plugins
+
+# 3. Done — your existing .vault/ directories work as-is
 ```
 
 See [Migration](#migration) for full details.
@@ -472,9 +482,11 @@ Upgrading from v1 (skill) to v2 (plugin):
 rm -rf ~/.claude/skills/knowledge-vault
 ```
 
-**Step 2** -- Install the plugin:
-```bash
-git clone https://github.com/psypeal/claude-knowledge-vault.git ~/.claude/plugins/knowledge-vault
+**Step 2** -- Install the plugin (in Claude Code):
+```
+/plugin marketplace add psypeal/claude-knowledge-vault
+/plugin install knowledge-vault@claude-knowledge-vault
+/reload-plugins
 ```
 
 **Step 3** -- Verify (in any project with an existing vault):
