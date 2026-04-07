@@ -10,9 +10,9 @@ Question: `$ARGUMENTS`
 1. Read `wiki/index.md`.
 2. Pick 2-4 relevant summaries or concepts from the index.
 3. Read only those files. Go to `raw/` only if summaries lack detail.
-4. Answer concisely with `[[wikilinks]]` to sources.
+4. Answer concisely with `[[wikilinks]]` to sources. Keep the answer short and direct — do not echo article contents back.
 
-**That's it for most queries.** Do NOT read preferences.md, agent.md, agent-update-rules.md, or scan outputs/ unless specifically needed below.
+**That's it for most queries.** Do NOT read preferences.md, agent.md, agent-update-rules.md, or scan outputs/ unless specifically needed below. Minimize file reads to keep context lean.
 
 ## When to do more
 

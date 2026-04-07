@@ -28,4 +28,4 @@ bash "${CLAUDE_PLUGIN_ROOT}/scripts/rebuild-index.sh"
 bash "${CLAUDE_PLUGIN_ROOT}/scripts/update-state.sh" .vault last_lint="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 ```
 
-Print summary: "Vault lint: X critical, Y warnings, Z suggestions."
+Print summary: "Vault lint: X critical, Y warnings, Z suggestions." Keep output terse — do not echo full article contents.

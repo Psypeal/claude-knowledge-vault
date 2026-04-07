@@ -4,7 +4,7 @@ description: Audit and actively fix wiki article quality
 
 ## Procedure
 
-0. Read `.vault/preferences.md` -- apply domain context to quality judgments.
+0. Read `.vault/preferences.md` only if not already read in this session.
 1. **Context building**: Read `wiki/index.md`, `wiki/_backlinks.json`, and scan all concept and summary articles. Map the full wiki structure.
 2. **Per-article audit** -- for each concept article, evaluate:
 
@@ -27,4 +27,6 @@ description: Audit and actively fix wiki article quality
    ```
 7. Report: "Cleanup complete: X articles restructured, Y stubs enriched, Z articles split, W broken links fixed."
 
-**Writing quality**: Read `${CLAUDE_PLUGIN_ROOT}/skills/vault-operations/references/writing-rules.md` for tone, length targets, and structure-by-type guidance.
+**Writing quality**: Only read `${CLAUDE_PLUGIN_ROOT}/skills/vault-operations/references/writing-rules.md` if not already read in this session.
+
+**Context note**: Report only summary counts. Do not echo full article contents back to the user.

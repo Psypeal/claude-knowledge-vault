@@ -56,3 +56,5 @@ The source is provided in `$ARGUMENTS`. Accept: URL, file path, pasted text, or 
    ```bash
    bash "${CLAUDE_PLUGIN_ROOT}/scripts/index-append.sh" "<slug>" "<type>"
    ```
+
+**Context note**: Report only: "Ingested <title> as raw/<slug>.md". Do not echo file contents.

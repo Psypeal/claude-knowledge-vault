@@ -9,7 +9,7 @@ If `$ARGUMENTS` names a specific source slug, compile only that source. Otherwis
 
 > **Batch mode** (2+ pending sources): read all raw sources first, build a merged compilation plan, then execute all writes in a single pass.
 
-0. Read `.vault/preferences.md` — apply domain, priority, granularity, and compilation focus.
+0. Read `.vault/preferences.md` only if not already read in this session.
 1. Read `.vault/raw/.manifest.json`. Identify entries where `compiled: false`.
 2. **Plan phase**: Read ALL pending raw sources sequentially. For each, note concepts to create/update and evidence to extract. Then MERGE: if sources A and B both touch concept X, group those updates together.
    - Which concepts to create vs update
@@ -54,4 +54,6 @@ If `$ARGUMENTS` names a specific source slug, compile only that source. Otherwis
 
 **Concept slugs**: lowercase, hyphens, max 60 chars.
 
-**Writing quality**: Read `${CLAUDE_PLUGIN_ROOT}/skills/vault-operations/references/writing-rules.md` for tone, length targets, anti-cramming/anti-thinning, and quality checkpoints.
+**Writing quality**: Only read `${CLAUDE_PLUGIN_ROOT}/skills/vault-operations/references/writing-rules.md` on the first compile in this session. Skip if already read.
+
+**Context note**: Keep responses terse. Report only: "Compiled N sources, M concepts created/updated." Do not echo file contents back to the user.
