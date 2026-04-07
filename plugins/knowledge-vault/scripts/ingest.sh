@@ -26,46 +26,55 @@ if [ -f "$RAW_FILE" ]; then
     exit 1
 fi
 
+# Create raw file and update manifest via Python (safe against special chars in title)
+python3 - "$SLUG" "$TITLE" "$TYPE" "$TIMESTAMP" "$RAW_FILE" "$MANIFEST" "${TAGS[@]}" << 'PYEOF'
+import json, sys, os
+
+slug = sys.argv[1]
+title = sys.argv[2]
+source_type = sys.argv[3]
+timestamp = sys.argv[4]
+raw_file = sys.argv[5]
+manifest_path = sys.argv[6]
+tags = list(sys.argv[7:])
+
+# Escape title for YAML double-quoted scalar (backslash, then double-quote)
+yaml_title = title.replace('\\', '\\\\').replace('"', '\\"')
+
 # Build tags YAML array
-TAGS_YAML="[]"
-if [ ${#TAGS[@]} -gt 0 ]; then
-    TAGS_YAML="[$(printf '"%s", ' "${TAGS[@]}" | sed 's/, $//')]"
-fi
+if tags:
+    tags_yaml = '[' + ', '.join(f'"{t}"' for t in tags) + ']'
+else:
+    tags_yaml = '[]'
 
-# Create raw file with YAML frontmatter
-cat > "$RAW_FILE" << FRONTMATTER
----
-title: "$TITLE"
-source: ""
-type: $TYPE
-ingested: "$TIMESTAMP"
-tags: $TAGS_YAML
-compiled: false
----
-
-FRONTMATTER
+# Write raw file with YAML frontmatter
+with open(raw_file, 'w') as f:
+    f.write(f'---\n')
+    f.write(f'title: "{yaml_title}"\n')
+    f.write(f'source: ""\n')
+    f.write(f'type: {source_type}\n')
+    f.write(f'ingested: "{timestamp}"\n')
+    f.write(f'tags: {tags_yaml}\n')
+    f.write(f'compiled: false\n')
+    f.write(f'---\n\n')
 
 # Update manifest
-python3 -c "
-import json, sys
-
-manifest_path = '$MANIFEST'
 with open(manifest_path, 'r') as f:
     manifest = json.load(f)
 
 manifest['sources'].append({
-    'slug': '$SLUG',
-    'title': '$TITLE',
-    'file': '$SLUG.md',
-    'type': '$TYPE',
-    'ingested': '$TIMESTAMP',
+    'slug': slug,
+    'title': title,
+    'file': f'{slug}.md',
+    'type': source_type,
+    'ingested': timestamp,
     'compiled': False,
-    'tags': $TAGS_YAML
+    'tags': tags
 })
 
 with open(manifest_path, 'w') as f:
     json.dump(manifest, f, indent=2)
-"
+PYEOF
 
 echo "Created $RAW_FILE"
 echo "Manifest updated. Claude will fill in the content body."

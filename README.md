@@ -318,37 +318,19 @@ Tier 3  ─────  raw/                    Full source text (only when dep
 
 ## Compounding Knowledge
 
-Every query can make the vault smarter. When you ask a question, Claude automatically classifies the answer and decides whether it enriches the knowledge graph.
+Queries answer questions from the vault. When an answer is particularly valuable, you can choose to save it back into the vault, enriching future queries.
 
-```mermaid
-flowchart TD
-    Q["/knowledge-vault:query"] --> A["Compose answer\nfrom vault sources"]
-    A --> D{"Dedup check:\nalready answered?"}
-    D -->|yes| S1["Reference existing output\n(no duplicate filed)"]
-    D -->|no| C{"Classify"}
-    C -->|"2+ sources,\nnew relationship,\nevidence-backed"| SYN["**Synthesize**"]
-    C -->|"200+ words or\n3+ concepts"| REC["**Record**"]
-    C -->|"single source\nor simple lookup"| SKIP["**Skip**"]
-    SYN --> F1["File to wiki/outputs/\n+ update concept graph"]
-    REC --> F2["File to wiki/outputs/"]
-    SKIP --> F3["Answer only\n(nothing filed)"]
+### How it works
 
-    style SYN fill:#2d6a4f,color:#fff
-    style REC fill:#1d3557,color:#fff
-    style SKIP fill:#6c757d,color:#fff
-```
+1. **Query**: Claude reads `wiki/index.md`, picks 2-4 relevant articles, and answers your question with `[[wikilinks]]` to sources.
+2. **File it**: If the answer is worth keeping, say "file it". Claude saves it to `wiki/outputs/` and updates the index. Filed answers become available to future queries.
+3. **Leave it**: Most queries just return an answer and nothing is saved. Simple lookups pass through without adding noise.
 
-### The three tiers
-
-| Tier | When | What happens | Example |
-|:-----|:-----|:-------------|:--------|
-| **Synthesize** | Answer connects 2+ sources and reveals a relationship not already in the graph | Files the answer AND updates concept `related` fields in both directions | *"How do tau tracers compare across generations?"* draws from two papers, links `tau-tracers` &#8596; `tau-pet-imaging` |
-| **Record** | Substantial analysis but no new connections | Files the answer for future reference | *"Summarize what we know about subcortical tau"* -- useful reference, but concepts already linked |
-| **Skip** | Simple lookup or already answered | Answers without filing | *"Which sources mention amyloid?"* -- quick factual lookup |
+Filing is always user-initiated -- Claude does not automatically classify or save answers.
 
 ### Connection strength
 
-Not all connections are equal. When a Synthesize query discovers a new relationship, it gets a strength rating:
+When you file an answer that connects multiple concepts, the connection gets a strength rating:
 
 | Strength | Criteria | Graph impact |
 |:---------|:---------|:-------------|
@@ -358,17 +340,23 @@ Not all connections are equal. When a Synthesize query discovers a new relations
 
 ### Safeguards
 
-- **Deduplication**: Before filing, checks if an existing output already covers the same question or connection
+When filing an answer:
+
+- **Deduplication**: Checks if an existing output already covers the same question or connection
 - **Graph density cap**: Max 8 `related` entries per concept -- new connections only replace weaker ones
 - **Weak connections quarantined**: Speculative links stay in outputs, not in the concept graph, until confirmed
-
-This means the concept graph stays clean and high-signal. Each deep query strengthens it. Shallow queries pass through without noise.
 
 <br />
 
 ## Smart Agent
 
-The vault includes a self-improving retrieval agent (`.vault/agent.md`) that learns from your queries and gets smarter over time.
+The vault includes a learning retrieval agent (`.vault/agent.md`) that gradually improves article routing based on your query history.
+
+The agent does not activate on every query. It kicks in after a few queries and improves gradually:
+
+- **Pre-routing** (reading agent.md before the index) activates only after 5+ total queries in the vault.
+- **Agent updates** (writing back to agent.md) happen only after 3+ queries in the same session.
+- Most queries -- especially early ones -- never touch agent.md at all.
 
 ```mermaid
 flowchart LR
@@ -379,6 +367,8 @@ flowchart LR
     E --> U["Update agent.md\nreinforce/expand/decay"]
     U -.->|next query| A
 ```
+
+Note: The loop above activates after a few queries and improves gradually -- it does not run on every query from the start.
 
 ### What it learns
 

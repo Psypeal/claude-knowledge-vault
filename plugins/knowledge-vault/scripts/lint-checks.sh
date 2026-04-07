@@ -7,6 +7,8 @@ set -euo pipefail
 
 VAULT_DIR="${1:-.vault}"
 
+export VAULT_DIR
+
 python3 << 'PYEOF'
 import json, os, re, glob
 

@@ -25,6 +25,7 @@ Combine script output + Claude checks into `wiki/outputs/lint-YYYY-MM-DD.md`. Ru
 
 ```bash
 bash "${CLAUDE_PLUGIN_ROOT}/scripts/rebuild-index.sh"
+bash "${CLAUDE_PLUGIN_ROOT}/scripts/update-state.sh" .vault last_lint="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 ```
 
 Print summary: "Vault lint: X critical, Y warnings, Z suggestions."

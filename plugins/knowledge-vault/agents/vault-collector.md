@@ -41,10 +41,14 @@ You are a research collection agent for the Knowledge Vault.
 
 7. **Batch ingest**: For each selected item:
    a. Fetch full metadata (title, authors, abstract, DOI, date).
-   b. Fetch full text if available (PubMed `get_full_text_article`, arXiv download).
-   c. Generate slug from title (lowercase, hyphens, max 60 chars).
-   d. Run: `bash "${CLAUDE_PLUGIN_ROOT}/scripts/ingest.sh" "<slug>" "<title>" "paper" [tags...]`
-   e. Fill in the raw file content body with abstract + full text (if available).
+   b. Generate slug from title (lowercase, hyphens, max 60 chars).
+   c. Run: `bash "${CLAUDE_PLUGIN_ROOT}/scripts/ingest.sh" "<slug>" "<title>" "paper" [tags...]`
+   d. **Apply condensation** (same rules as `/knowledge-vault:ingest` step 2):
+      - If content (abstract + any available text) is 1000+ words, produce a structured extraction: Metadata, Abstract, Key Findings, Methods, Quantitative Data — capping at ~800-1200 words.
+      - If content is short (<1000 words), store abstract + metadata as-is.
+      - Do NOT fetch full text by default. Store the DOI/URL in the `source:` field for re-fetching if full text is ever needed.
+      - Only fetch full text if the user explicitly requested it (e.g., "collect with full text").
+   e. Fill in the raw file content body with the condensed or short-form content.
    f. Set `source:` field to DOI URL or arXiv URL.
 
 8. **Report**: "Collected N items from M sources. N items pending compilation."

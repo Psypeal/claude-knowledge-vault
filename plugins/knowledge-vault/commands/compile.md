@@ -39,11 +39,12 @@ If `$ARGUMENTS` names a specific source slug, compile only that source. Otherwis
       ---
       ```
    c. Cross-reference: update `related` fields. Use `[[wikilinks]]` in bodies.
-4. **Mark compiled** (via script — no need to re-read raw files):
+4. **Mark compiled** (via scripts — no need to re-read raw files):
+   For each compiled source:
    ```bash
    bash "${CLAUDE_PLUGIN_ROOT}/scripts/update-frontmatter.sh" .vault/raw/<slug>.md compiled=true
+   bash "${CLAUDE_PLUGIN_ROOT}/scripts/update-manifest.sh" <slug> compiled=true
    ```
-   Repeat for each compiled source.
 5. **Rebuild index + backlinks + state** (via script — no need to read every file):
    ```bash
    bash "${CLAUDE_PLUGIN_ROOT}/scripts/rebuild-index.sh"

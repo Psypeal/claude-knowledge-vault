@@ -12,6 +12,8 @@ BACKLINKS="$WIKI/_backlinks.json"
 MANIFEST="$VAULT_DIR/raw/.manifest.json"
 STATE="$WIKI/.state.json"
 
+export VAULT_DIR
+
 python3 << 'PYEOF'
 import json, os, re, glob
 from datetime import datetime, timezone
