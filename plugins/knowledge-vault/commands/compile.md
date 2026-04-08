@@ -3,19 +3,19 @@ description: Compile pending sources into wiki articles
 argument-hint: "[source-slug]"
 ---
 
+Your final response MUST be terse: "Compiled N sources, M concepts created/updated." or "Nothing pending." Do not echo file contents.
+
 ## Procedure
 
 If `$ARGUMENTS` names a specific source slug, compile only that source. Otherwise compile all pending.
 
-> **Batch mode** (2+ pending sources): read all raw sources first, build a merged compilation plan, then execute all writes in a single pass.
-
-0. Read `.vault/preferences.md` only if not already read in this session.
 1. Read `.vault/raw/.manifest.json`. Identify entries where `compiled: false`.
-2. **Plan phase**: Read ALL pending raw sources sequentially. For each, note concepts to create/update and evidence to extract. Then MERGE: if sources A and B both touch concept X, group those updates together.
-   - Which concepts to create vs update
-   - Key evidence to extract
-   - Cross-references to add
-3. **Execute phase**: Process each unique concept ONCE across all sources. Do not re-read a concept file that was already read for another source in this batch. Work through the plan:
+   **If zero entries are pending: respond "Nothing pending — all sources already compiled." and STOP. Do not read any files, do not call any scripts.**
+
+> **Batch mode** (2+ pending sources): read all raw sources first, output a numbered plan listing concepts to create/update, then execute writes in a single pass.
+
+2. **Plan phase**: Read each pending raw source. For each, note concepts to create/update and evidence to extract. If batch, output: "Plan: [list concepts and which sources feed them]". Merge overlapping concept work.
+3. **Execute phase**: Process each unique concept ONCE across all sources.
    a. Write summaries (`wiki/summaries/<slug>.md`, 200-500 words):
       ```yaml
       ---
@@ -27,33 +27,21 @@ If `$ARGUMENTS` names a specific source slug, compile only that source. Otherwis
       word_count: 350
       ---
       ```
-   b. For each UNIQUE concept in the plan, read the concept file ONCE (if existing), apply ALL updates from ALL sources, write ONCE:
-      ```yaml
-      ---
-      title: "Concept Name"
-      aliases: [alt-name]
-      created: "ISO timestamp"
-      updated: "ISO timestamp"
-      sources: [source-slug]
-      related: [other-concept]
-      ---
-      ```
-   c. Cross-reference: update `related` fields. Use `[[wikilinks]]` in bodies.
-4. **Mark compiled** (via scripts — no need to re-read raw files):
-   For each compiled source:
+   b. For each UNIQUE concept, read the concept file ONCE (if existing), apply ALL updates, write ONCE.
+   c. Cross-reference: update `related` fields. Use `[[wikilinks]]` in bodies. Do NOT read `_backlinks.json` — the script handles that.
+4. **Mark compiled** — call BOTH scripts for EACH compiled source slug individually:
    ```bash
-   bash "${CLAUDE_PLUGIN_ROOT}/scripts/update-frontmatter.sh" .vault/raw/<slug>.md compiled=true
-   bash "${CLAUDE_PLUGIN_ROOT}/scripts/update-manifest.sh" <slug> compiled=true
+   bash "${CLAUDE_PLUGIN_ROOT}/scripts/update-frontmatter.sh" .vault/raw/SOURCE1.md compiled=true
+   bash "${CLAUDE_PLUGIN_ROOT}/scripts/update-manifest.sh" SOURCE1 compiled=true
+   bash "${CLAUDE_PLUGIN_ROOT}/scripts/update-frontmatter.sh" .vault/raw/SOURCE2.md compiled=true
+   bash "${CLAUDE_PLUGIN_ROOT}/scripts/update-manifest.sh" SOURCE2 compiled=true
    ```
-5. **Rebuild index + backlinks + state** (via script — no need to read every file):
+   One pair of calls per source. Do NOT batch multiple slugs into one call.
+5. **Rebuild**:
    ```bash
    bash "${CLAUDE_PLUGIN_ROOT}/scripts/rebuild-index.sh"
    bash "${CLAUDE_PLUGIN_ROOT}/scripts/update-state.sh" .vault last_compiled="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
    ```
-6. **Update agent.md**: For each compiled source, add/update Source Signals entry (cited: 0, topic domains). Increment `vault_stats.total_compiles`.
+6. **Update agent.md** ONLY if `agent.md` frontmatter shows `total_queries >= 3`. Add/update Source Signals. Increment `total_compiles`.
 
-**Concept slugs**: lowercase, hyphens, max 60 chars.
-
-**Writing quality**: Only read `${CLAUDE_PLUGIN_ROOT}/skills/vault-operations/references/writing-rules.md` on the first compile in this session. Skip if already read.
-
-**Context note**: Keep responses terse. Report only: "Compiled N sources, M concepts created/updated." Do not echo file contents back to the user.
+**Tone: flat, factual. Max 2 quotes per article. Split if 3+ sub-topics.**

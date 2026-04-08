@@ -1,0 +1,50 @@
+run_id	timestamp	test_id	criterion	pass	evidence
+1775644556	2026-04-08T10:35:56Z	ingest-url	ingest-sh-called	1	calls=1
+1775644556	2026-04-08T10:35:56Z	ingest-url	index-append-called	1	calls=1
+1775644556	2026-04-08T10:35:56Z	ingest-url	no-content-echo	1	checked message
+1775644556	2026-04-08T10:35:56Z	ingest-url	response-under-100w	1	words=13
+1775644556	2026-04-08T10:35:56Z	ingest-notes	ingest-sh-called	1	calls=1
+1775644556	2026-04-08T10:35:56Z	ingest-notes	index-append-called	1	calls=1
+1775644556	2026-04-08T10:35:56Z	ingest-notes	not-condensed	1	no condensation in write
+1775644556	2026-04-08T10:35:56Z	ingest-notes	type-is-notes	1	checked ingest args
+1775644556	2026-04-08T10:35:56Z	ingest-notes	response-under-100w	1	words=9
+1775644556	2026-04-08T10:35:56Z	ingest-long	ingest-sh-called	1	calls=1
+1775644556	2026-04-08T10:35:56Z	ingest-long	no-content-echo	1	checked message
+1775644556	2026-04-08T10:35:56Z	ingest-long	response-under-100w	1	words=12
+1775644556	2026-04-08T10:35:56Z	ingest-special	ingest-sh-no-error	1	no error
+1775644556	2026-04-08T10:35:56Z	ingest-special	index-append-called	1	calls=1
+1775644556	2026-04-08T10:35:56Z	ingest-special	response-under-100w	1	words=12
+1775644556	2026-04-08T10:35:56Z	compile-single	prefs-read-max-once	1	reads=1
+1775644556	2026-04-08T10:35:56Z	compile-single	update-frontmatter-called	1	calls=1
+1775644556	2026-04-08T10:35:56Z	compile-single	update-manifest-called	1	calls=1
+1775644556	2026-04-08T10:35:56Z	compile-single	rebuild-index-once	1	calls=1
+1775644556	2026-04-08T10:35:56Z	compile-single	update-state-called	1	calls=1
+1775644556	2026-04-08T10:35:56Z	compile-single	response-under-150w	1	words=13
+1775644556	2026-04-08T10:35:56Z	compile-batch	prefs-read-max-once	1	reads=1
+1775644556	2026-04-08T10:35:56Z	compile-batch	writing-rules-max-once	1	reads=1
+1775644556	2026-04-08T10:35:56Z	compile-batch	update-frontmatter-twice	0	calls=1
+1775644556	2026-04-08T10:35:56Z	compile-batch	update-manifest-twice	0	calls=1
+1775644556	2026-04-08T10:35:56Z	compile-batch	rebuild-index-once	1	calls=1
+1775644556	2026-04-08T10:35:56Z	compile-batch	plan-before-execute	0	checked for planning
+1775644556	2026-04-08T10:35:56Z	compile-batch	response-under-150w	1	words=14
+1775644556	2026-04-08T10:35:56Z	compile-empty	no-raw-reads	0	raw_reads=2
+1775644556	2026-04-08T10:35:56Z	compile-empty	no-rebuild	0	calls=1
+1775644556	2026-04-08T10:35:56Z	compile-empty	mentions-nothing-pending	0	checked message
+1775644556	2026-04-08T10:35:56Z	compile-empty	response-under-50w	1	words=13
+1775644556	2026-04-08T10:35:56Z	query-simple	index-read-first	1	reads=1
+1775644556	2026-04-08T10:35:56Z	query-simple	max-4-articles	1	reads=3
+1775644556	2026-04-08T10:35:56Z	query-simple	no-prefs-read	1	reads=0
+1775644556	2026-04-08T10:35:56Z	query-simple	no-agent-rules-read	1	reads=0
+1775644556	2026-04-08T10:35:56Z	query-simple	no-output-filed	1	checked writes
+1775644556	2026-04-08T10:35:56Z	query-simple	response-under-200w	1	words=101
+1775644556	2026-04-08T10:35:56Z	query-cross	index-read	1	reads=2
+1775644556	2026-04-08T10:35:56Z	query-cross	max-4-articles	1	reads=3
+1775644556	2026-04-08T10:35:56Z	query-cross	has-wikilink	1	checked for [[links]]
+1775644556	2026-04-08T10:35:56Z	query-cross	no-prefs-read	1	reads=0
+1775644556	2026-04-08T10:35:56Z	query-cross	no-output-filed	1	checked writes
+1775644556	2026-04-08T10:35:56Z	query-cross	response-under-200w	1	words=160
+1775644556	2026-04-08T10:35:56Z	query-missing	index-read	1	reads=2
+1775644556	2026-04-08T10:35:56Z	query-missing	max-1-extra-read	1	reads=0
+1775644556	2026-04-08T10:35:56Z	query-missing	says-not-covered	1	checked message
+1775644556	2026-04-08T10:35:56Z	query-missing	no-raw-reads	1	reads=0
+1775644556	2026-04-08T10:35:56Z	query-missing	response-under-100w	1	words=60

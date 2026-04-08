@@ -1,0 +1,1 @@
+/knowledge-vault:ingest Paper title: 5-HT2A Receptor Binding & Alzheimer's "Tau" Pathology: A Meta-Analysis. This paper examines serotonin receptor binding patterns in Alzheimer's disease tau pathology. Published in Neurology 2024. Key finding: reduced 5-HT2A binding correlates with tau burden in temporal cortex (r=-0.67, p<0.001).

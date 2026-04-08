@@ -1,0 +1,8 @@
+run_id	timestamp	test_id	criterion	pass	evidence
+1775645729	2026-04-08T10:55:29Z	compile-batch	prefs-read-max-once	1	reads=0
+1775645729	2026-04-08T10:55:29Z	compile-batch	writing-rules-max-once	1	reads=0
+1775645729	2026-04-08T10:55:29Z	compile-batch	update-frontmatter-twice	1	calls=2
+1775645729	2026-04-08T10:55:29Z	compile-batch	update-manifest-twice	1	calls=2
+1775645729	2026-04-08T10:55:29Z	compile-batch	rebuild-index-once	1	calls=1
+1775645729	2026-04-08T10:55:29Z	compile-batch	plan-before-execute	1	checked all output
+1775645729	2026-04-08T10:55:29Z	compile-batch	response-under-150w	1	words=20

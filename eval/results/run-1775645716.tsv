@@ -1,0 +1,5 @@
+run_id	timestamp	test_id	criterion	pass	evidence
+1775645716	2026-04-08T10:55:16Z	compile-empty	no-raw-reads	1	raw_reads=0
+1775645716	2026-04-08T10:55:16Z	compile-empty	no-rebuild	1	calls=0
+1775645716	2026-04-08T10:55:16Z	compile-empty	mentions-nothing-pending	1	checked message
+1775645716	2026-04-08T10:55:16Z	compile-empty	response-under-50w	1	words=7
