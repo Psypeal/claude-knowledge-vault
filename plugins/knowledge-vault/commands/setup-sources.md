@@ -10,5 +10,6 @@ description: Configure research MCP servers for academic collection
    - **Consensus**: `claude mcp add --transport http consensus https://mcp.consensus.app/mcp`
    - **arXiv**: `claude mcp add arxiv-mcp-server -- uvx arxiv-mcp-server --storage-path .vault/raw/arxiv-papers`
    - **Paper Search** (14 databases): `claude mcp add paper-search -- npx -y paper-search-mcp-nodejs`
+   - **Zotero** (enables `/knowledge-vault:ingest-zotero`): `uv tool install zotero-mcp-server && zotero-mcp setup`
 4. Let user approve which servers to add. Run approved commands.
 5. Update `.vault/sources.json` with the new configuration.

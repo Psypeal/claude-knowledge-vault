@@ -32,7 +32,9 @@ flowchart LR
         CO["Consensus"]
         PS["Paper Search\n(14 databases)"]
     end
+    Z["Zotero\nLibrary"]
     collect -->|"/knowledge-vault:collect"| R["raw/\n.manifest.json\nsources.json"]
+    Z -->|"/knowledge-vault:ingest-zotero"| R
     A["URLs, files,\nnotes, clips"] -->|"/knowledge-vault:ingest"| R
     CL["Obsidian\nWeb Clipper"] -->|auto| CLP["Clippings/"]
     CLP -->|"/knowledge-vault:process"| R
@@ -172,6 +174,7 @@ See [Migration](#migration) for full details.
 |:--------|:------------|
 | **`/knowledge-vault:init`** | Initialize a `.vault/` knowledge base in the current project |
 | **`/knowledge-vault:ingest <source>`** | Add a raw source -- URL, pasted text, or file path |
+| **`/knowledge-vault:ingest-zotero <collection>`** | Batch ingest papers from a Zotero collection (metadata, fulltext, annotations) |
 | **`/knowledge-vault:collect <query>`** | Batch search academic databases and selectively ingest results |
 | **`/knowledge-vault:setup-sources`** | Configure research MCP servers for academic collection |
 | **`/knowledge-vault:compile`** | Compile pending sources into wiki summaries and concept articles |
@@ -197,6 +200,7 @@ The headline feature of v2. `/knowledge-vault:collect` searches multiple academi
 | **Consensus** | HTTP MCP | `claude mcp add --transport http consensus https://mcp.consensus.app/mcp` | Research consensus engine |
 | **arXiv** | stdio MCP | `claude mcp add arxiv-mcp-server -- uvx arxiv-mcp-server --storage-path .vault/raw/arxiv-papers` | arXiv preprints |
 | **Paper Search** | stdio MCP | `claude mcp add paper-search -- npx -y paper-search-mcp-nodejs` | 14 databases: arXiv, PubMed, Semantic Scholar, bioRxiv, medRxiv, Crossref, CORE, OpenAlex, DOAJ, Europe PMC, Internet Archive Scholar, Fatcat, BASE, DBLP |
+| **Zotero** | stdio MCP | `uv tool install zotero-mcp-server && zotero-mcp setup` | Your local Zotero library — collections, metadata, PDF fulltext, annotations |
 
 ### How it works
 
@@ -239,6 +243,78 @@ Once registered, `/knowledge-vault:collect` will include your custom server in b
 /knowledge-vault:collect CRISPR delivery --count 5                 # max 5 results per source
 /knowledge-vault:collect meta-analysis sleep cognition --type review  # filter by type
 ```
+
+<br />
+
+## Zotero Integration
+
+`/knowledge-vault:ingest-zotero <collection>` batch-imports papers from your **local Zotero library** — metadata, PDF fulltext, and your highlighted annotations — and drops them into the vault's `raw/` directory ready for compilation.
+
+### Setup
+
+Install [54yyyu/zotero-mcp](https://github.com/54yyyu/zotero-mcp) once:
+
+```bash
+uv tool install zotero-mcp-server && zotero-mcp setup
+```
+
+Then make sure Zotero is running with local API enabled (Zotero 7+: Settings → Advanced → Allow other applications on this computer to communicate with Zotero).
+
+### How it works
+
+```
+Zotero collection  ──▶  list items  ──▶  you pick which to ingest
+       │
+       ▼
+  For each paper:
+    - metadata (title, authors, year, DOI, BetterBibTeX citekey, Zotero key)
+    - PDF fulltext (if attached)
+    - your highlighted annotations (if any)
+       │
+       ▼
+  Structured extraction  ──▶  raw/<slug>.md  ──▶  /knowledge-vault:compile
+  (~800-1200 words, not the full PDF — the full paper stays in Zotero)
+```
+
+### Usage
+
+```
+> /knowledge-vault:ingest-zotero hippocampus-review-2024
+
+  Found collection: "Hippocampus Review 2024" (12 items)
+
+  | # | Title                                            | Authors           | Year | Type     |
+  |---|--------------------------------------------------|-------------------|------|----------|
+  | 1 | Place cell remapping in CA1 after sleep          | Tanaka et al.     | 2024 | paper    |
+  | 2 | Entorhinal grid cells and path integration       | Rowland & Moser   | 2023 | paper    |
+  | 3 | Hippocampal theta rhythm: a 50-year review       | Buzsáki           | 2024 | review   |
+  ...
+
+  Ingest which? (e.g., 1,3,5 or all)
+> all
+
+  Ingested 12 papers. Run /knowledge-vault:compile now?
+```
+
+### What gets preserved
+
+Each raw file gains extra Zotero-specific frontmatter fields so you can trace back to the source:
+
+```yaml
+---
+title: "Place cell remapping in CA1 after sleep"
+source: "https://doi.org/10.1038/s41593-024-xxxxx"
+type: paper
+zotero_key: "ABCD1234"
+citekey: "tanaka2024place"
+doi: "10.1038/s41593-024-xxxxx"
+year: 2024
+authors: ["Tanaka K", "Moser EI", "..."]
+compiled: false
+---
+```
+
+Re-running the command is safe — existing slugs are skipped, so you can incrementally pull new items as you add them to Zotero.
 
 <br />
 
@@ -542,8 +618,9 @@ That's it. Your existing `.vault/` directories are fully compatible. No data mig
 
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) v2.0+
 - `python3` (for JSON updates in helper scripts)
-- `uv` *(optional, for arXiv MCP server)*
+- `uv` *(optional, for arXiv and Zotero MCP servers)*
 - `npx` / Node.js *(optional, for Paper Search MCP server)*
+- [Zotero](https://www.zotero.org) 7+ *(optional, for `/knowledge-vault:ingest-zotero`)*
 - [Obsidian](https://obsidian.md) *(optional, for browsing)*
 
 <br />
@@ -554,6 +631,8 @@ That's it. Your existing `.vault/` directories are fully compatible. No data mig
 - [agno-agi/pal](https://github.com/agno-agi/pal) -- manifest tracking, YAML schemas, linting architecture
 - [farzaa/wiki](https://github.com/farzaa/wiki) -- wiki-as-knowledge-base pattern
 - [blazickjp/arxiv-mcp-server](https://github.com/blazickjp/arxiv-mcp-server) -- arXiv MCP server
+- [54yyyu/zotero-mcp](https://github.com/54yyyu/zotero-mcp) -- Zotero MCP server powering `/knowledge-vault:ingest-zotero`
+- [Galaxy-Dawn/claude-scholar](https://github.com/Galaxy-Dawn/claude-scholar) -- inspiration for the Zotero → knowledge-base workflow
 
 ## License
 

@@ -45,7 +45,7 @@ for claude_json_path in ['.claude.json', os.path.expanduser('~/.claude.json')]:
             cj = json.load(f)
         servers = cj.get('mcpServers', {})
         for name, config in servers.items():
-            if any(kw in name.lower() for kw in ['arxiv', 'pubmed', 'scholar', 'consensus', 'paper-search']):
+            if any(kw in name.lower() for kw in ['arxiv', 'pubmed', 'scholar', 'consensus', 'paper-search', 'zotero']):
                 detected.append({
                     'id': name,
                     'name': name,
@@ -79,6 +79,14 @@ recommended = [
         'type': 'stdio',
         'note': 'arXiv, PubMed, Semantic Scholar, bioRxiv, medRxiv, Crossref + more',
         'add_command': 'claude mcp add paper-search -- npx -y paper-search-mcp-nodejs',
+        'api_key': False
+    },
+    {
+        'id': 'zotero',
+        'name': 'Zotero',
+        'type': 'stdio',
+        'note': 'Read your local Zotero library — collections, metadata, PDF fulltext, annotations (enables /knowledge-vault:ingest-zotero)',
+        'add_command': 'uv tool install zotero-mcp-server && zotero-mcp setup',
         'api_key': False
     }
 ]
